@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuote } from '../hooks/useQuote';
+import QuoteTable from './QuoteTable'; // adjust path if needed
 
 export default function QuoteCard() {
   const [input, setInput] = useState('');
@@ -36,41 +37,7 @@ export default function QuoteCard() {
       {loading && <p>Loading…</p>}
       {error && <p style={{ color: 'crimson' }}>{error}</p>}
 
-      {data && (
-        <table
-          style={{ marginTop: 16, width: '100%', borderCollapse: 'collapse' }}
-        >
-          <tbody>
-            <tr>
-              <td>Price</td>
-              <td>
-                {data.regularMarketPrice ?? '—'} {data.currency ?? ''}
-              </td>
-            </tr>
-            <tr>
-              <td>Day high</td>
-              <td>{data.regularMarketDayHigh ?? '—'}</td>
-            </tr>
-            <tr>
-              <td>Day low</td>
-              <td>{data.regularMarketDayLow ?? '—'}</td>
-            </tr>
-            <tr>
-              <td>Change %</td>
-              <td
-                style={{
-                  color:
-                    (data.regularMarketChangePercent ?? 0) >= 0
-                      ? 'green'
-                      : 'crimson',
-                }}
-              >
-                {fmt(data.regularMarketChangePercent)}%
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      )}
+      {data && data.table && <QuoteTable table={data.table} />}
     </div>
   );
 }
