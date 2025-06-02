@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
- import './App.scss';
+import './App.scss';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -8,7 +8,7 @@ function App() {
     <div className="App">
       <p>
         <button onClick={() => setCount((count) => count + 1)}>
-          count is: {count}
+          count: {count}
         </button>
       </p>
     </div>
