@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Router, Link } from '@reach/router';
 import QuoteCard from './components/QuoteCard';
+import GapFinder from './components/GapFinder';
 
 function Home() {
-  return <QuoteCard />;
+  return <GapFinder />;
 }
 
 function About() {
@@ -11,14 +12,15 @@ function About() {
 }
 
 function Dashboard() {
-  return <h2>Contact Page</h2>;
+  return <QuoteCard />;
 }
 
 export default function App() {
   return (
     <div>
       <nav>
-        <Link to="/">Home</Link> <Link to="dashboard">Dashboard</Link>
+        <Link to="/">Home</Link>
+        <Link to="dashboard">Dashboard</Link>
       </nav>
       <Router>
         <Home path="/" />

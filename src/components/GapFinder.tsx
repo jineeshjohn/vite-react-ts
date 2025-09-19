@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQuote } from '../hooks/useQuote';
 
 /**
  * props.table = [
@@ -7,50 +8,19 @@ import { useState } from 'react';
  *   …
  * ]
  */
-export default function QuoteTable({ table }) {
-  const [sortField, setSortField] = useState('diff');
-  const [ascending, setAscending] = useState(false);
-
-  //   const sorted = [...table].sort((a, b) => {
-  //     const x = a[sortField];
-  //     const y = b[sortField];
-  //     return ascending ? x - y : y - x;
-  //   });
-  const sorted = [...table].sort((a, b) => {
-    let x = a[sortField];
-    let y = b[sortField];
-
-    /* if the column is “date”, convert YYYY-MM-DD → millis */
-    if (sortField === 'date') {
-      x = Date.parse(x);
-      y = Date.parse(y);
-    }
-
-    return ascending ? x - y : y - x;
-  });
-
-  function toggle(field) {
-    if (field === sortField) setAscending(!ascending);
-    else {
-      setSortField(field);
-      setAscending(false);
-    }
-  }
-
-  const caret = (field) => (sortField !== field ? '' : ascending ? ' ▲' : ' ▼');
-
+function GapFinderTable({ table }) {
   return (
     <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 12 }}>
       <thead style={{ cursor: 'pointer' }}>
         <tr>
-          <th onClick={() => toggle('date')}>Date{caret('date')}</th>
-          <th onClick={() => toggle('open')}>Open{caret('open')}</th>
-          <th onClick={() => toggle('close')}>Close{caret('close')}</th>
-          <th onClick={() => toggle('diff')}>Δ Close-Open{caret('diff')}</th>
+          <th>Date</th>
+          <th>Open </th>
+          <th>Close </th>
+          <th>Δ Close-Open </th>
         </tr>
       </thead>
       <tbody>
-        {sorted.map((row) => (
+        {table.map((row) => (
           <tr key={row.date}>
             <td>{row.date}</td>
             <td style={{ textAlign: 'right' }}>{row.open.toFixed(2)}</td>
@@ -67,5 +37,44 @@ export default function QuoteTable({ table }) {
         ))}
       </tbody>
     </table>
+  );
+}
+export default function GapFinderCard() {
+  const [input, setInput] = useState('');
+  const [symbol, setSymbol] = useState('');
+  const { data, loading, error } = useQuote(symbol);
+
+  /* ---------- helpers ---------- */
+  const fmt = (n?: number) =>
+    n !== undefined && n !== null ? n.toFixed(2) : '—';
+
+  return (
+    <div
+      style={{ maxWidth: 480, margin: '1rem auto', fontFamily: 'sans-serif' }}
+    >
+      <h2>Yahoo Quote Fetcher - GAPS</h2>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setSymbol(input.trim().toUpperCase());
+        }}
+      >
+        <input
+          value={input}
+          placeholder="e.g. AAPL"
+          onChange={(e) => setInput(e.target.value)}
+          style={{ padding: '.4rem .6rem', fontSize: '1rem' }}
+        />
+        <button type="submit" style={{ marginLeft: 8 }}>
+          Go
+        </button>
+      </form>
+
+      {loading && <p>Loading…</p>}
+      {error && <p style={{ color: 'crimson' }}>{error}</p>}
+
+      {data && data.table && <QuoteTable table={data.table} />}
+    </div>
   );
 }
