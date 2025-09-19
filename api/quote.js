@@ -39,12 +39,18 @@ async function handler(req, res) {
       interval: '1d',
     });
 
-    const table = rows.map((r) => ({
-      date: r.date.toISOString().slice(0, 10),
-      open: r.open,
-      close: r.close,
-      diff: r.close - r.open,
-    }));
+    const table = rows.map((r) => {
+      console.log('JJJ: ', r);
+      return {
+        date: r.date.toISOString().slice(0, 10),
+        open: r.open,
+        close: r.close,
+        high: r.high,
+        low: r.low,
+        volumn: r.volume,
+        diff: r.close - r.open,
+      };
+    });
 
     return res.status(200).json({ symbol, table });
   } catch (err) {
