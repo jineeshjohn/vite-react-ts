@@ -17,7 +17,7 @@ function Dashboard() {
 
 export default function App() {
   return (
-    <div>
+    <div style={{ margin: '4rem' }}>
       <nav>
         <Link to="/">Home</Link>
         <Link to="dashboard">Dashboard</Link>

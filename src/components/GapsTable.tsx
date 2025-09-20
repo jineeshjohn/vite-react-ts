@@ -3,11 +3,9 @@ import { useMemo, useState } from 'react';
 export default function QuoteTable({ table }) {
   const [sortField, setSortField] = useState('date');
   const [ascending, setAscending] = useState(false);
+  const [highlightMode, setHighlightMode] = useState('gap'); // 'gap' | 'week' | 'month'
 
-  // NEW: highlight mode — 'gap' | 'week' | 'month'
-  const [highlightMode, setHighlightMode] = useState('gap');
-
-  // Build prevClose, gapUp, Open−Low, Open−High using true chronological order
+  // ---- build derived fields (chronological: oldest → newest) ----
   const augmented = useMemo(() => {
     if (!Array.isArray(table)) return [];
     const byDateAsc = [...table].sort(
@@ -21,11 +19,20 @@ export default function QuoteTable({ table }) {
         row.open != null && row.low != null ? row.open - row.low : null;
       const openMinusHigh =
         row.open != null && row.high != null ? row.open - row.high : null;
-      return { ...row, prevClose, gapUp, openMinusLow, openMinusHigh };
+      const closeMinusOpen =
+        row.close != null && row.open != null ? row.close - row.open : null; // NEW
+      return {
+        ...row,
+        prevClose,
+        gapUp,
+        openMinusLow,
+        openMinusHigh,
+        closeMinusOpen,
+      };
     });
   }, [table]);
 
-  // Sorting (dates as timestamps)
+  // ---- sorting (dates as timestamps) ----
   const sorted = useMemo(() => {
     const arr = [...augmented];
     arr.sort((a, b) => {
@@ -52,7 +59,7 @@ export default function QuoteTable({ table }) {
   const caret = (field) => (sortField !== field ? '' : ascending ? ' ▲' : ' ▼');
   const fmt = (n) => (n == null ? '—' : Number(n).toFixed(2));
 
-  // ---- minimal, consistent borders for all cells ----
+  // ---- fixed header + borders ----
   const BORDER = '1px solid #d0d7de';
   const PAD = '6px 8px';
   const thStyle = {
@@ -61,14 +68,18 @@ export default function QuoteTable({ table }) {
     background: '#f8f9fb',
     cursor: 'pointer',
     textAlign: 'left',
+    position: 'sticky',
+    top: 0,
+    zIndex: 1, // sticky header
   };
   const tdText = { border: BORDER, padding: PAD, textAlign: 'left' };
   const tdNum = { border: BORDER, padding: PAD, textAlign: 'right' };
 
-  // Helpers for banding
-  function isoWeekIndex(isoDateString) {
-    const d = new Date(isoDateString + 'T00:00:00Z');
-    // ISO week: move to Thursday of the current week
+  // ---- highlight helpers ----
+  const HILITE = '#cfdeed'; // requested color
+
+  function isoWeekIndex(iso) {
+    const d = new Date(iso + 'T00:00:00Z');
     const utc = new Date(
       Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()),
     );
@@ -76,31 +87,27 @@ export default function QuoteTable({ table }) {
     utc.setUTCDate(utc.getUTCDate() + 4 - day);
     const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
     const week = Math.ceil(((utc - yearStart) / 86400000 + 1) / 7);
-    // make a running index so parity is stable across years
-    return utc.getUTCFullYear() * 53 + week;
+    return utc.getUTCFullYear() * 53 + week; // running index
   }
-  function monthIndex(isoDateString) {
-    const [y, m] = isoDateString.split('-').map(Number); // YYYY-MM-DD
+  function monthIndex(iso) {
+    const [y, m] = iso.split('-').map(Number);
     return y * 12 + (m - 1);
   }
-
-  // Decide row background based on current highlight mode
   function rowBg(row) {
     if (highlightMode === 'gap') {
       return row.gapUp > 0 ? '#c1e2c1' : '#efdddd'; // your original colors
     }
     if (highlightMode === 'week') {
       const even = isoWeekIndex(row.date) % 2 === 0;
-      return even ? '#cfdeed' : 'transparent'; // subtle zebra by ISO week
+      return even ? HILITE : 'transparent'; // use #cfdeed for weeks
     }
     if (highlightMode === 'month') {
       const even = monthIndex(row.date) % 2 === 0;
-      return even ? '#cfdeed' : 'transparent'; // zebra by calendar month
+      return even ? HILITE : 'transparent'; // use #cfdeed for months
     }
     return undefined;
   }
 
-  // Simple button styles
   const btn = (active) => ({
     padding: '6px 10px',
     border: '1px solid #d0d7de',
@@ -113,7 +120,7 @@ export default function QuoteTable({ table }) {
 
   return (
     <>
-      {/* NEW: highlight controls */}
+      {/* highlight controls */}
       <div
         style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}
       >
@@ -137,110 +144,127 @@ export default function QuoteTable({ table }) {
         </button>
       </div>
 
-      <table
-        style={{ width: '100%', borderCollapse: 'collapse', marginTop: 12 }}
-      >
-        <thead>
-          <tr>
-            <th style={thStyle} onClick={() => toggle('date')}>
-              Datecolumn{caret('date')}
-            </th>
-            <th style={thStyle} onClick={() => toggle('high')}>
-              High{caret('high')}
-            </th>
-            <th style={thStyle} onClick={() => toggle('volume')}>
-              Volume{caret('volume')}
-            </th>
-            <th style={thStyle} onClick={() => toggle('open')}>
-              Open{caret('open')}
-            </th>
-            <th style={thStyle} onClick={() => toggle('low')}>
-              Low{caret('low')}
-            </th>
-            <th style={thStyle} onClick={() => toggle('close')}>
-              Close{caret('close')}
-            </th>
-            <th style={thStyle} onClick={() => toggle('prevClose')}>
-              Prev&nbsp;Close{caret('prevClose')}
-            </th>
-            <th style={thStyle} onClick={() => toggle('gapUp')}>
-              Gap (open−prevClose){caret('gapUp')}
-            </th>
-            <th style={thStyle} onClick={() => toggle('openMinusLow')}>
-              Open−Low{caret('openMinusLow')}
-            </th>
-            <th style={thStyle} onClick={() => toggle('openMinusHigh')}>
-              Open−High{caret('openMinusHigh')}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {sorted.map((row) => (
-            <tr
-              key={row.date}
-              style={{ backgroundColor: rowBg(row) }}
-              title={
-                highlightMode === 'gap'
-                  ? row.gapUp > 0
-                    ? 'Gap up'
-                    : row.gapUp < 0
-                    ? 'Gap down'
-                    : undefined
-                  : undefined
-              }
-            >
-              <td style={tdText}>{row.date}</td>
-              <td style={tdNum}>{fmt(row.high)}</td>
-              <td style={tdNum}>
-                {row.volume == null ? '—' : Number(row.volume).toLocaleString()}
-              </td>
-              <td style={tdNum}>{fmt(row.open)}</td>
-              <td style={tdNum}>{fmt(row.low)}</td>
-              <td style={tdNum}>{fmt(row.close)}</td>
-              <td style={tdNum}>{fmt(row.prevClose)}</td>
-              <td
-                style={{
-                  ...tdNum,
-                  color:
-                    row.gapUp == null
-                      ? undefined
-                      : row.gapUp > 0
-                      ? 'green'
-                      : 'crimson',
-                }}
-              >
-                {row.gapUp == null ? '—' : row.gapUp.toFixed(2)}
-              </td>
-              <td
-                style={{
-                  ...tdNum,
-                  color:
-                    row.openMinusLow == null
-                      ? undefined
-                      : row.openMinusLow > 0
-                      ? 'crimson'
-                      : undefined,
-                }}
-              >
-                {row.openMinusLow == null ? '—' : row.openMinusLow.toFixed(2)}
-              </td>
-              <td
-                style={{
-                  ...tdNum,
-                  color:
-                    row.openMinusHigh == null
-                      ? undefined
-                      : row.openMinusHigh < 0
-                      ? 'green'
-                      : 'crimson',
-                }}
-              >
-                {row.openMinusHigh == null ? '—' : row.openMinusHigh.toFixed(2)}
-              </td>
+      {/* scroll container so only rows scroll */}
+      <div style={{ maxHeight: '100vh', marginTop: 12 }}>
+        <table style={{ width: '100%' }}>
+          <thead>
+            <tr>
+              <th style={thStyle} onClick={() => toggle('serial')}>
+                #
+              </th>{' '}
+              {/* NEW serial header (not sortable by value) */}
+              <th style={thStyle} onClick={() => toggle('date')}>
+                Datecolumn{caret('date')}
+              </th>
+              <th style={thStyle} onClick={() => toggle('high')}>
+                High{caret('high')}
+              </th>
+              <th style={thStyle} onClick={() => toggle('volume')}>
+                Volume{caret('volume')}
+              </th>
+              <th style={thStyle} onClick={() => toggle('open')}>
+                Open{caret('open')}
+              </th>
+              <th style={thStyle} onClick={() => toggle('low')}>
+                Low{caret('low')}
+              </th>
+              <th style={thStyle} onClick={() => toggle('close')}>
+                Close{caret('close')}
+              </th>
+              <th style={thStyle} onClick={() => toggle('prevClose')}>
+                Prev&nbsp;Close{caret('prevClose')}
+              </th>
+              <th style={thStyle} onClick={() => toggle('gapUp')}>
+                Gap (open−prevClose){caret('gapUp')}
+              </th>
+              <th style={thStyle} onClick={() => toggle('openMinusLow')}>
+                Open−Low{caret('openMinusLow')}
+              </th>
+              <th style={thStyle} onClick={() => toggle('openMinusHigh')}>
+                Open−High{caret('openMinusHigh')}
+              </th>
+              <th style={thStyle} onClick={() => toggle('closeMinusOpen')}>
+                Close−Open{caret('closeMinusOpen')}
+              </th>{' '}
+              {/* NEW */}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {sorted.map((row, idx) => (
+              <tr
+                key={row.date}
+                style={{ backgroundColor: rowBg(row) }}
+                title={
+                  highlightMode === 'gap'
+                    ? row.gapUp > 0
+                      ? 'Gap up'
+                      : row.gapUp < 0
+                      ? 'Gap down'
+                      : undefined
+                    : undefined
+                }
+              >
+                <td style={{ ...tdNum, width: 56 }}>{idx + 1}</td>{' '}
+                {/* Serial # */}
+                <td style={tdText}>{row.date}</td>
+                <td style={tdNum}>{fmt(row.high)}</td>
+                <td style={tdNum}>{row.volumn == null ? '—-j' : row.volumn}</td>
+                <td style={tdNum}>{fmt(row.open)}</td>
+                <td style={tdNum}>{fmt(row.low)}</td>
+                <td style={tdNum}>{fmt(row.close)}</td>
+                <td style={tdNum}>{fmt(row.prevClose)}</td>
+                <td
+                  style={{
+                    ...tdNum,
+                    color:
+                      row.gapUp == null
+                        ? undefined
+                        : row.gapUp > 0
+                        ? 'green'
+                        : 'crimson',
+                  }}
+                >
+                  {row.gapUp == null ? '—' : row.gapUp.toFixed(2)}
+                </td>
+                <td
+                  style={{
+                    ...tdNum,
+                    color:
+                      row.openMinusLow == null
+                        ? undefined
+                        : row.openMinusLow > 0
+                        ? 'crimson'
+                        : undefined,
+                  }}
+                >
+                  {row.openMinusLow == null ? '—' : row.openMinusLow.toFixed(2)}
+                </td>
+                <td
+                  style={{
+                    ...tdNum,
+                    color:
+                      row.openMinusHigh == null
+                        ? undefined
+                        : row.openMinusHigh < 0
+                        ? 'green'
+                        : 'crimson',
+                  }}
+                >
+                  {row.openMinusHigh == null
+                    ? '—'
+                    : row.openMinusHigh.toFixed(2)}
+                </td>
+                <td style={tdNum}>
+                  {row.closeMinusOpen == null
+                    ? '—'
+                    : row.closeMinusOpen.toFixed(2)}
+                </td>{' '}
+                {/* NEW */}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

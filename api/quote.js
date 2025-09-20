@@ -25,7 +25,6 @@ async function handler(req, res) {
 
   const url = new URL(req.url, 'http://x'); // dummy base
   const symbol = (url.searchParams.get('symbol') || 'AAPL').toUpperCase();
-  console.log('REQ symbol:', symbol);
 
   /* time window: last 12 months */
   const today = new Date();
@@ -40,7 +39,6 @@ async function handler(req, res) {
     });
 
     const table = rows.map((r) => {
-      console.log('JJJ: ', r);
       return {
         date: r.date.toISOString().slice(0, 10),
         open: r.open,

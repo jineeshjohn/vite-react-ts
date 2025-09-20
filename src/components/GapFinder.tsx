@@ -12,9 +12,7 @@ export default function QuoteCard() {
     n !== undefined && n !== null ? n.toFixed(2) : '—';
 
   return (
-    <div
-      style={{ maxWidth: 700, margin: '1rem auto', fontFamily: 'sans-serif' }}
-    >
+    <div>
       <h2>Yahoo Quote Fetcher - GAPS</h2>
 
       <form
