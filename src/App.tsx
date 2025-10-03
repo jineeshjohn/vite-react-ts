@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Router, Link } from '@reach/router';
+import { Routes, Route, Link } from 'react-router-dom';
 import QuoteCard from './components/QuoteCard';
 import GapFinder from './components/GapFinder';
 
@@ -19,13 +19,12 @@ export default function App() {
   return (
     <div style={{ margin: '4rem' }}>
       <nav>
-        <Link to="/">Home</Link>
-        <Link to="dashboard">Dashboard</Link>
+        <Link to="/">Home</Link> | <Link to="dashboard">Dashboard</Link>
       </nav>
-      <Router>
-        <Home path="/" />
-        <Dashboard path="dashboard" />
-      </Router>
+      <Routes>
+        <Route path="/" element={<Home />} /> |
+        <Route path="dashboard" element={<Dashboard />} />
+      </Routes>
     </div>
   );
 }
