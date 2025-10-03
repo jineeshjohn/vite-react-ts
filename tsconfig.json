@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",               
+    "paths": {
+      "@api/*": ["api/*"]        
+    },
     "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["vite/client"],
