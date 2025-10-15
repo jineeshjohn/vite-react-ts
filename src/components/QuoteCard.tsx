@@ -13,7 +13,7 @@ export default function QuoteCard() {
 
   return (
     <div
-      style={{ maxWidth: 480, margin: '1rem auto', fontFamily: 'sans-serif' }}
+      style={{ maxWidth: 750, margin: '1rem auto', fontFamily: 'sans-serif', textAlign: 'left' }}
     >
       <h2>Yahoo Quote Fetcher</h2>
 
