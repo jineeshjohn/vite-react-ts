@@ -57,8 +57,8 @@ export default function QuoteTable({ table }) {
           <tr key={row.date}>
             <td>{row.date}</td>
             <td>{row.volumn}</td>
-            <td>{row.high}</td>
-            <td>{row.low}</td>
+            <td>{row.high.toFixed(2)}</td>
+            <td>{row.low.toFixed(2)}</td>
             <td style={{ textAlign: 'right' }}>{row.open.toFixed(2)}</td>
             <td style={{ textAlign: 'right' }}>{row.close.toFixed(2)}</td>
             <td

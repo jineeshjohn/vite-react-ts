@@ -15,7 +15,7 @@ export default function QuoteCard() {
     <div
       style={{ maxWidth: 750, margin: '1rem auto', fontFamily: 'sans-serif', textAlign: 'left' }}
     >
-      <h2>Yahoo Quote Fetcher</h2>
+      <h2>Yahoo Quote Fetcher -test</h2>
 
       <form
         onSubmit={(e) => {
