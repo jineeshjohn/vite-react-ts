@@ -45,6 +45,8 @@ export default function QuoteTable({ table }) {
         <tr>
           <th onClick={() => toggle('date')}>Date{caret('date')}</th>
           <th onClick={() => toggle('volumn')}>Volumn{caret('volumn')}</th>
+          <th onClick={() => toggle('high')}>High{caret('high')}</th>
+          <th onClick={() => toggle('low')}>Low{caret('low')}</th>
           <th onClick={() => toggle('open')}>Open{caret('open')}</th>
           <th onClick={() => toggle('close')}>Close{caret('close')}</th>
           <th onClick={() => toggle('diff')}>Δ Close-Open{caret('diff')}</th>
@@ -55,6 +57,8 @@ export default function QuoteTable({ table }) {
           <tr key={row.date}>
             <td>{row.date}</td>
             <td>{row.volumn}</td>
+            <td>{row.high}</td>
+            <td>{row.low}</td>
             <td style={{ textAlign: 'right' }}>{row.open.toFixed(2)}</td>
             <td style={{ textAlign: 'right' }}>{row.close.toFixed(2)}</td>
             <td
