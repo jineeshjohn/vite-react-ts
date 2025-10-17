@@ -8,22 +8,21 @@ function Home() {
 }
 
 function About() {
-  return <h2>About Page</h2>;
+  return <h2>About Page...</h2>;
 }
 
-function Dashboard() {
-  return <QuoteCard />;
-}
+ 
 
 export default function App() {
   return (
     <div style={{ margin: '4rem' }}>
       <nav>
-        <Link to="/">Home</Link> | <Link to="dashboard">Dashboard</Link>
+        <Link to="/">Home</Link> | <Link to="dashboard">Dashboard</Link> | <Link to="trending">Trends</Link>
       </nav>
       <Routes>
         <Route path="/" element={<Home />} /> |
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="dashboard" element={<QuoteCard />} />
+        <Route path="trending" element={<About />} />
       </Routes>
     </div>
   );

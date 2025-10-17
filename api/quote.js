@@ -45,7 +45,7 @@ async function handler(req, res) {
         close: r.close,
         high: r.high,
         low: r.low,
-        volumn: r.volume,
+        volume: r.volume,
         diff: r.close - r.open,
       };
     });

@@ -208,7 +208,7 @@ export default function QuoteTable({ table }) {
                 {/* Serial # */}
                 <td style={tdText}>{row.date}</td>
                 <td style={tdNum}>{fmt(row.high)}</td>
-                <td style={tdNum}>{row.volumn == null ? '—-j' : row.volumn}</td>
+                <td style={tdNum}>{row.volume == null ? '—-j' : row.volume}</td>
                 <td style={tdNum}>{fmt(row.open)}</td>
                 <td style={tdNum}>{fmt(row.low)}</td>
                 <td style={tdNum}>{fmt(row.close)}</td>

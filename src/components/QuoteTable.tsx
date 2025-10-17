@@ -44,7 +44,7 @@ export default function QuoteTable({ table }) {
       <thead style={{ cursor: 'pointer' }}>
         <tr>
           <th onClick={() => toggle('date')}>Date{caret('date')}</th>
-          <th onClick={() => toggle('volumn')}>Volumn{caret('volumn')}</th>
+          <th onClick={() => toggle('volume')}>Volume{caret('volume')}</th>
           <th onClick={() => toggle('high')}>High{caret('high')}</th>
           <th onClick={() => toggle('low')}>Low{caret('low')}</th>
           <th onClick={() => toggle('open')}>Open{caret('open')}</th>
@@ -56,7 +56,7 @@ export default function QuoteTable({ table }) {
         {sorted.map((row) => (
           <tr key={row.date}>
             <td>{row.date}</td>
-            <td>{row.volumn}</td>
+            <td>{row.volume}</td>
             <td>{row.high.toFixed(2)}</td>
             <td>{row.low.toFixed(2)}</td>
             <td style={{ textAlign: 'right' }}>{row.open.toFixed(2)}</td>
