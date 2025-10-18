@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import QuoteCard from './components/QuoteCard';
 import GapFinder from './components/GapFinder';
+import Trends from './components/TrendsCard';
 
 function Home() {
   return <GapFinder />;
@@ -22,7 +23,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} /> |
         <Route path="dashboard" element={<QuoteCard />} />
-        <Route path="trending" element={<About />} />
+        <Route path="trending" element={<Trends />} />
       </Routes>
     </div>
   );

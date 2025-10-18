@@ -10,3 +10,13 @@ export async function fetchQuote(symbol: string) {
   }
   return res.json();
 }
+export async function fetchQuoteList(symbols: string) {
+  const res = await fetch(
+    `/api/symbols?symbols=${encodeURIComponent(symbols)}`,
+  );
+
+  if (!res.ok) {
+    throw new Error(await res.text());
+  }
+  return res.json();
+}

@@ -2,30 +2,23 @@ import { useState } from 'react';
 
 /**
  * props.table = [
- *   { date: '2025-05-30', open:  175.23, close: 176.40, diff:  1.17 },
- *   { date: '2025-05-29', open:  172.80, close: 171.10, diff: -1.70 },
- *   …
+ *   { date: '2025-05-30', open: 175.23, close: 176.40, diff: 1.17 },
+ *   { date: '2025-05-29', open: 172.80, close: 171.10, diff: -1.70 },
  * ]
  */
-export default function QuoteTable({ table }) {
-  const [sortField, setSortField] = useState('date');
+export default function Trends({ table }) {
   const [ascending, setAscending] = useState(false);
 
-  //   const sorted = [...table].sort((a, b) => {
-  //     const x = a[sortField];
-  //     const y = b[sortField];
-  //     return ascending ? x - y : y - x;
-  //   });
+  // sort by date or diff depending on clicked column
+  const [sortField, setSortField] = useState('date');
+
   const sorted = [...table].sort((a, b) => {
     let x = a[sortField];
     let y = b[sortField];
-
-    /* if the column is “date”, convert YYYY-MM-DD → millis */
     if (sortField === 'date') {
       x = Date.parse(x);
       y = Date.parse(y);
     }
-
     return ascending ? x - y : y - x;
   });
 
@@ -44,25 +37,22 @@ export default function QuoteTable({ table }) {
       <thead style={{ cursor: 'pointer' }}>
         <tr>
           <th onClick={() => toggle('date')}>Date{caret('date')}</th>
-          <th onClick={() => toggle('volume')}>Volume{caret('volume')}</th>
-          <th onClick={() => toggle('high')}>High{caret('high')}</th>
-          <th onClick={() => toggle('low')}>Low{caret('low')}</th>
-          <th onClick={() => toggle('open')}>Open{caret('open')}</th>
-          <th onClick={() => toggle('close')}>Close{caret('close')}</th>
-          <th onClick={() => toggle('diff')}>Δ Close-Open{caret('diff')}</th>
+          <th
+            onClick={() => toggle('diff')}
+            style={{ width: '1%', whiteSpace: 'nowrap', textAlign: 'right' }}
+          >
+            Δ Close-Open{caret('diff')}
+          </th>
         </tr>
       </thead>
       <tbody>
         {sorted.map((row) => (
           <tr key={row.date}>
             <td>{row.date}</td>
-            <td>{row.volume}</td>
-            <td>{row.high.toFixed(2)}</td>
-            <td>{row.low.toFixed(2)}</td>
-            <td style={{ textAlign: 'right' }}>{row.open.toFixed(2)}</td>
-            <td style={{ textAlign: 'right' }}>{row.close.toFixed(2)}</td>
             <td
               style={{
+                width: '1%',
+                whiteSpace: 'nowrap',
                 textAlign: 'right',
                 color: row.diff >= 0 ? 'green' : 'crimson',
               }}

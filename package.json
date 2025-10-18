@@ -2,7 +2,8 @@
   "scripts": {
     "dev": "concurrently \"vite --host\" \"node api/quote.js\"",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "api": "node api/quote.js"
   },
   "dependencies": {
     "react": "^18.3.0",
