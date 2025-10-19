@@ -37,7 +37,7 @@ const FnoFilters: React.FC = () => {
   const results = useMemo(() => {
     const a = parseSymbols(list1);
     const b = parseSymbols(list2);
-    return intersect(a, b);
+    return intersect(a, b).sort((x, y) => x.localeCompare(y)); // ✅ ascending A→Z
   }, [list1, list2]);
 
   const copyResults = async () => {
