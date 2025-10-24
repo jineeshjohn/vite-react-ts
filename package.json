@@ -1,14 +1,13 @@
 {
   "scripts": {
-    "dev": "concurrently \"vite --host\" \"node api/quote.js\"",
+    "dev": "concurrently \"vite --host\" \"node api/server.mjs\"",
     "build": "vite build",
-    "serve": "vite preview",
-    "api": "node api/quote.js"
+    "serve": "vite preview"
   },
   "dependencies": {
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "react-router-dom":"^7.9.3", 
+    "react-router-dom": "^7.9.3",
     "sass": "^1.77.0",
     "yahoo-finance2": "^2.13.3"
   },

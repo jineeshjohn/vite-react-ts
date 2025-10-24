@@ -1,26 +1,45 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
-/**
- * props.table = [
- *   { date: '2025-05-30', open: 175.23, close: 176.40, diff: 1.17 },
- *   { date: '2025-05-29', open: 172.80, close: 171.10, diff: -1.70 },
- * ]
- */
 export default function Trends({ table }) {
   const [ascending, setAscending] = useState(false);
+  const [sortField, setSortField] = useState('date'); // default by date (desc)
 
-  // sort by date or diff depending on clicked column
-  const [sortField, setSortField] = useState('date');
+  // 1) Build prevDiff using chronological order (oldest -> newest)
+  const augmented = useMemo(() => {
+    const chrono = [...table].sort(
+      (a, b) => Date.parse(a.date) - Date.parse(b.date)
+    );
 
-  const sorted = [...table].sort((a, b) => {
-    let x = a[sortField];
-    let y = b[sortField];
-    if (sortField === 'date') {
-      x = Date.parse(x);
-      y = Date.parse(y);
+    // Map: date -> (today.close - previous.close)
+    const prevDiffByDate = new Map();
+    for (let i = 1; i < chrono.length; i++) {
+      const prev = chrono[i - 1];
+      const cur = chrono[i];
+      prevDiffByDate.set(cur.date, cur.close - prev.close);
     }
-    return ascending ? x - y : y - x;
-  });
+
+    // Attach prevDiff to original rows by date
+    return table.map((r) => ({
+      ...r,
+      prevDiff: prevDiffByDate.get(r.date) ?? null,
+    }));
+  }, [table]);
+
+  // 2) Sort for display (by date, diff, or prevDiff)
+  const sorted = useMemo(() => {
+    return [...augmented].sort((a, b) => {
+      let x = a[sortField];
+      let y = b[sortField];
+      if (sortField === 'date') {
+        x = Date.parse(a.date);
+        y = Date.parse(b.date);
+      }
+      // put nulls (e.g., oldest row's prevDiff) at the end consistently
+      if (x == null && y != null) return 1;
+      if (x != null && y == null) return -1;
+      return ascending ? x - y : y - x;
+    });
+  }, [augmented, sortField, ascending]);
 
   function toggle(field) {
     if (field === sortField) setAscending(!ascending);
@@ -40,8 +59,16 @@ export default function Trends({ table }) {
           <th
             onClick={() => toggle('diff')}
             style={{ width: '1%', whiteSpace: 'nowrap', textAlign: 'right' }}
+            title="Close - Open"
           >
-            Δ Close-Open{caret('diff')}
+            C-O{caret('diff')}
+          </th>
+          <th
+            onClick={() => toggle('prevDiff')}
+            style={{ width: '1%', whiteSpace: 'nowrap', textAlign: 'right' }}
+            title="Today's Close - Previous Close"
+          >
+            C-PC{caret('prevDiff')}
           </th>
         </tr>
       </thead>
@@ -58,6 +85,17 @@ export default function Trends({ table }) {
               }}
             >
               {row.diff.toFixed(2)}
+            </td>
+            <td
+              style={{
+                width: '1%',
+                whiteSpace: 'nowrap',
+                textAlign: 'right',
+                color:
+                  row.prevDiff == null ? '#999' : row.prevDiff >= 0 ? 'green' : 'crimson',
+              }}
+            >
+              {row.prevDiff == null ? '—' : row.prevDiff.toFixed(2)}
             </td>
           </tr>
         ))}

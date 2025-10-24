@@ -1,5 +1,5 @@
 import { fetchMultiSymbols } from './_shared.js';
-
+// 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   const url = new URL(req.url || '/api/symbols', `https://${req.headers.host || 'localhost'}`);
