@@ -4,6 +4,7 @@ import QuoteCard from './components/QuoteCard';
 import GapFinder from './components/GapFinder';
 import Trends from './components/TrendsCard';
 import FnoFilters from './pages/FnoFilters';
+import FnoLive from './pages/FNOLive';
 
 function Home() {
   return <GapFinder />;
@@ -19,13 +20,15 @@ export default function App() {
       <nav>
         <Link to="/">Home</Link> | <Link to="dashboard">Dashboard</Link> |{' '}
         <Link to="trending">Trends</Link> |
-        <Link to="fno-filters">FNO filters</Link>
+        <Link to="fno-filters">FNO filters</Link> |
+        <Link to="fno-live">FNO Live</Link>
       </nav>
       <Routes>
         <Route path="/" element={<Home />} /> |
         <Route path="dashboard" element={<QuoteCard />} />
         <Route path="trending" element={<Trends />} />
         <Route path="fno-filters" element={<FnoFilters />} />
+        <Route path="fno-live" element={<FnoLive />} />
       </Routes>
     </div>
   );
