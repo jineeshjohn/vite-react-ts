@@ -91,6 +91,7 @@ export async function fetchLiveQuotes(listCSV) {
 
   // yahoo-finance2 has a `quote` method that can take an array of tickers
   // and returns an array of quote objects
+  console.log("Final symbols: ", symbols)
   const quotes = await yahooFinance.quote(symbols);
 
   // We return these raw. Your React code expects fields like:
