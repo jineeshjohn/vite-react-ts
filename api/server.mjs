@@ -70,22 +70,31 @@ async function handler(req, res) {
       console.log('[devServer] /api/quotes (yahoo-finance2 path)');
 
       try {
-        // const rawList = url.searchParams.get('symbols');
-        // if (!rawList) {
-        //   return res.status(400).json({ error: 'symbols query required' });
-        // }
-        // console.log('JJJ: ', rawList);
-        const snapshot = await fetchLiveQuotes(RAW_SYMBOLS);
+        // ✅ Parse JSON body from POST request
+        let body = '';
+        await new Promise((resolve) => {
+          req.on('data', (chunk) => (body += chunk));
+          req.on('end', resolve);
+        });
+
+        const { symbols } = JSON.parse(body || '{}');
+        if (!symbols) {
+          return res
+            .status(400)
+            .json({ error: 'symbols field required in request body' });
+        }
+
+        console.log('JJJ (POST symbols):', symbols);
+
+        const snapshot = await fetchLiveQuotes(symbols);
 
         // CORS headers are already being set at the top of handler()
         res.setHeader?.('Cache-Control', 'no-store');
 
         return res.status(200).json(snapshot);
       } catch (err) {
-        console.error('[devServer] /api/quotes FAILED:', err);
-        return res
-          .status(500)
-          .json({ error: err?.message || String(err) || 'Unknown error' });
+        console.error('[devServer] Error fetching quotes:', err);
+        return res.status(500).json({ error: 'Failed to fetch quotes' });
       }
     }
 

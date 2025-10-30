@@ -84,7 +84,15 @@ export default function FnoDashboard() {
         }
 
         // 2. Fetch live snapshot
-        const res = await fetch(`${API_BASE}/api/quotes?symbols=${SYMBOLS}`);
+        // const res = await fetch(`${API_BASE}/api/quotes?symbols=${SYMBOLS}`);
+        const res = await fetch(`${API_BASE}/api/quotes`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ symbols: SYMBOLS }),
+        });
+        
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}`);
         }
